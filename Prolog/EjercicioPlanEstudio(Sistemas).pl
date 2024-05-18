@@ -1,0 +1,129 @@
+%Materias: curso, cuatrimestre, codigo, nombre
+  %Primer Año (1ER CUATRIMESTRE)
+    materia(1,1,6111,introducion_a_la_programacion_1,0).
+    materia(1,1,6112,analisis_matematico_1,0).
+    materia(1,1,6113,algebra_1,0).
+    materia(1,1,6114,quimica,0).
+  %Primer Año (2DO CUATRIMESTRE)
+    materia(1,2,6121,ciencias_de_la_Computacion_1,0).
+    materia(1,2,6122,introduccion_a_la_programacion_2,1).
+    materia(1,2,6123,algebra_lineal,1).
+    materia(1,2,6124,fisica_General,1).
+    materia(1,2,6125,matematica_discreta,1).
+
+  %Segundo Año (1ER CUATRIMESTRE)
+    materia(2,1,6211,ciencias_de_la_Computación_II,3).
+    materia(2,1,6212,análisis_y_Diseño_de_Algoritmos_I,3).
+    materia(2,1,6213,introducción_a_la_Arquitectura_de_Sistemas,1).
+    materia(2,1,6214,análisis_Matemático_II,1).
+    materia(2,1,6215,electricidad_y_Magnetismo,1).
+  %Segundo Año (2DO CUATRIMESTRE)
+    materia(2,2,6221,análisis_y_Diseño_de_Algoritmos_II,2).
+    materia(2,2,6222,comunicación_de_Datos_I,1).
+    materia(2,2,6223,probabilidades_y_Estadística,3).
+    materia(2,2,6224,electrónica_Digital,1).
+    materia(2,2,0,ingles,0).
+
+  %Tercer Año (1ER CUATRIMESTRE)
+    materia(3,1,6311,programación_Orientada_a_Objetos,1).
+    materia(3,1,6312,estructuras_de_Almacenamiento_de_Datos,2).
+    materia(3,1,6313,metodologías_de_Desarrollo_de_Software_I,2).
+    materia(3,1,6314,arquitectura_de_Computadoras_I,2).
+  %Tercer Año (2DO CUATRIMESTRE)
+    materia(3,2,6321,programación_Exploratoria,1).
+    materia(3,2,6322,base_de_Datos_I,2).
+    materia(3,2,6323,lenguajes_de_Programación_I,1).
+    materia(3,2,6324,sistemas_Operativos_I,2).
+    materia(3,2,6325,investigación_Operativa_I,2).
+
+  %Cuarto Año (1ER CUATRIMESTRE)
+    materia(4,1,6411,arquitectura_de_Computadoras_y_Técnicas_Digitales,1).
+    materia(4,1,6412,teoría_de_la_Información,3).
+    materia(4,1,6413,comunicación_de_Datos_II,2).
+    materia(4,1,6414,introducción_al_Cálculo_Diferencial_e_Integral,1).
+  %Cuarto Año (2DO CUATRIMESTRE)
+    materia(4,2,6421,diseño_de_Sistemas_de_Software,3).
+    materia(4,2,6422,diseño_de_Compiladores_I,1).
+
+  %Quinto Año (1ER CUATRIMESTRE)
+    materia(5,1,6511,ingeniería_de_Software,1).
+
+%Correlativas
+  %Primer Año (1ER CUATRIMESTRE)
+   correlativa(6111,0,0,0).
+   correlativa(6112,0,0,0).
+   correlativa(6113,0,0,0).
+   correlativa(6114,0,0,0).
+  %Primer Año (2DO CUATRIMESTRE)
+   correlativa(6121,0,0,0).
+   correlativa(6122,6111,0,0).
+   correlativa(6123,6113,0,0).
+   correlativa(6124,6112,0,0).
+   correlativa(6125,6113,0,0).
+
+  %Segundo Año (1ER CUATRIMESTRE)
+   correlativa(6211,6121,6122,6125).
+   correlativa(6212,6121,6122,6125).
+   correlativa(6213,6122,0,0).
+   correlativa(6214,6112,0,0).
+   correlativa(6215,6124,0,0).
+  %Segundo Año (2DO CUATRIMESTRE)
+   correlativa(6221,6211,6212,0).
+   correlativa(6222,6215,0,0).
+   correlativa(6223,6214,6123,6125).
+   correlativa(6224,6215,0,0).
+
+  %Tercer Año (1ER CUATRIMESTRE)
+   correlativa(6311,6221,0,0).
+   correlativa(6312,6221,6223,0).
+   correlativa(6313,6213,6224,0).
+   correlativa(6314,6213,6224,0).
+  %Tercer Año (2DO CUATRIMESTRE)
+   correlativa(6321,6221,0,0).
+   correlativa(6322,6312,6313,0).
+   correlativa(6323,6311,0,0).
+   correlativa(6324,6312,6314,0).
+   correlativa(6325,6214,6223,0).
+
+  %Cuarto Año (1ER CUATRIMESTRE)
+   correlativa(6411,6314,0,0).
+   correlativa(6412,6212,6222,6223).
+   correlativa(6413,6222,6324,0).
+   correlativa(6414,6214,0,0).
+  %Cuarto Año (2DO CUATRIMESTRE)
+   correlativa(6421,6311,6322,6324).
+   correlativa(6422,6323,0,0).
+
+  %Quinto Año (1ER CUATRIMESTRE)
+   correlativa(6511,6421,0,0).
+
+
+%Listar materias por curso
+  buscar_nombre(X):-materia(X,_,_,Nombre,_), write(Nombre).
+  materias_de(Y):-write('Materias del curso:'),write(Y),nl,buscar_nombre(Y),nl,fail.
+
+%Listar materias con solo una correlativa
+    obtener_nombre(Z):-materia(_,_,Z,Nombre,_),write(Nombre),write(' ').
+
+  materia_una_correlativa:-correlativa(Codigo,X,Y,_),X>0,Y==0,write('Para cursar '),
+      obtener_nombre(Codigo),write(' Necesitas '),obtener_nombre(X),nl,fail.
+
+%Mostrar todo el plan de estudio
+  devolver_correlativas(X,Cant):-
+      Cant==0,write('Sin correlativas'),nl;
+      Cant==1,write('Correlativa:'),correlativa(X,Y,_,_),obtener_nombre(Y),nl;
+      Cant==2,write('Correlativa:'),correlativa(X,Y,Z,_),obtener_nombre(Y),
+         obtener_nombre(Z),nl;
+      Cant==3,write('Correlativa:'),correlativa(X,Y,Z,T),obtener_nombre(Y),
+         obtener_nombre(Z),obtener_nombre(T),nl.
+
+  plan_is:-materia(Anio,Cua,Codigo,Nombre,Cant),write('Curso:'),write(Anio),write(' '),
+      write('cua:'),write(Cua),write(' '),write('nom:'),write(Nombre),write(' '),
+        devolver_correlativas(Codigo,Cant),fail.
+
+
+
+
+
+
+
