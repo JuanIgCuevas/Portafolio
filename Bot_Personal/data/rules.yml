@@ -1,0 +1,17 @@
+version: "3.1"
+
+rules:
+
+# - rule: goodbye
+#   steps:
+#   - intent: Saludo
+#   - action: action_saludo
+  
+# - rule: Presentation
+#   steps:
+#   - intent: greet
+#   - action: utter_greet
+- rule: Manejar el fallback
+  steps:
+  - intent: nlu_fallback
+  - action: utter_NoEntiendo

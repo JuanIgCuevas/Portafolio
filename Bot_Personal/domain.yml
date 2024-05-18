@@ -1,0 +1,154 @@
+version: "3.1"
+
+intents:
+  - greet
+  - Saludo
+  - bot_challenge
+  - affirm
+  - deny
+  - mood_great
+  - mood_unhappy
+  - mood_angry
+  - estado
+  - agradecimiento
+  - finales
+  - materiasCursadas
+  - materiasCursando
+  - materiasOptativas
+  - involucracionProgramacion
+  - carrera
+  - gustos
+  - buscar
+  - devolverEventos
+  - nuevoEvento
+  - ingresarDia: 
+      ignore_entities:
+        - mood
+  - ingresarHorario
+
+entities:
+- mood
+- busqueda
+- dia
+- hora
+
+slots:
+  busqueda:
+    type: text
+    mappings:
+    - type: from_entity
+      entity: busqueda
+  mood:
+    type: categorical
+    values:
+      - happy
+      - sad
+      - angry
+    mappings:
+    - type: from_entity
+      entity: mood
+  dia:
+    type: text
+    mappings:
+    - type: from_entity
+      entity: dia
+  hora:
+    type: text
+    mappings:
+    - type: from_entity
+      entity: hora
+  id_chat:
+    type: text
+    mappings:
+    - type: custom
+    influence_conversation: false
+  id_message:
+    type: text
+    mappings:
+    - type: custom
+    influence_conversation: false
+  respondido:
+    type: bool
+    mappings:
+    - type: custom
+    influence_conversation: false
+  respBuscar:
+    type: bool
+    mappings:
+    - type: custom
+    influence_conversation: false
+
+
+responses:
+  utter_greet:
+  - text: hoola, Me llamo juani
+  - text: buenas, soy juani
+  - text: hola, mi nombre es juani
+
+  utter_iamabot:
+  - text: Soy el representante de 'juani'
+
+  utter_NoEntiendo:
+  - text: Disculpame, no te entiendo
+
+  utter_comoestas:
+  - text: Como estas?
+  - text: Como andas?
+  - text: Que tal estas?
+
+  utter_contrarespuestas:
+  - text: yo, muy bien!
+  - text: yo bien!
+  - text: bien bien!
+
+  utter_respuesta:
+  - text: gracias!!
+  - text: muchas gracias!
+
+  utter_dameDia:
+  - text: Que dia nos podemos juntar?
+
+  utter_NoEncontroBusqueda:
+  - text: No se encontro ningun resultado
+
+  utter_chiste:
+  - text: Queres que te cuente un chiste?
+
+  utter_optativas:
+  - text: No, aun no realize ninguna!
+
+  utter_carrera:
+  - text: Elegi ingenieria de sistemas porque, me intereza mucho la robotica que veia en mi secundaria orientada al campo.
+  - text: elegi estudiar ingenieria de sistemas, debido a que me interezo mucho las tecnologias de robotica vistas en mi secundaria.
+  - text: Tome la decicion de estudiar sistemas, ya que en mi secundaria me interezaba mucho las grandes tecnologias que habia implementadas al campo, por ejemplo maquinaria sin conductores.
+
+  utter_gustopersonal:
+  - text: Los temas que mas me gustan sobre la ingenieria de sistemas, son los relacionados con la IA y la robotica.
+  - text: Los temas que mas me interezan sobre la carrera son los relacionados con la IA y la robotica.
+
+  utter_primerasProgramacion:
+  - text: Mis primeros pasos con la programacion, fue con proyectos de arduinos en la secundaria.
+  - text: Me involucre en la programacion con un proyecto de arduino en mi secundaria.
+  - text: Lo que me involucro en la programacion, fue un proyecto de arduino en mi secundaria.
+
+
+session_config:
+  session_expiration_time: 60
+  carry_over_slots_to_new_session: true
+
+actions:
+  - action_mood
+  - action_saludo
+  - action_prolog_cursadas
+  - action_prolog_cursando
+  - action_prolog_finales
+  - action_traer_nombre
+  - action_wikipedia_api
+  - action_wikipedia_link
+  - action_wikipedia_linkNegado
+  - actionPinear
+  - actionResponder
+  - action_get_eventos
+  - action_crear_evento
+  - action_guardarMensaje
+  - ActionChistes

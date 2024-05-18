@@ -1,0 +1,269 @@
+version: "3.1"
+
+nlu:
+- intent: greet
+  examples: |
+    - Hola
+    - Hola!
+    - Holis
+    - Buenas
+    - Bueenas
+    - Buen dia
+    - Buenos dias
+    - Buenas tardes
+    - Buenas noches
+    - hey
+    - que onda
+
+- intent: Saludo
+  examples: |
+    - Adios
+    - Chau
+    - Nos vemos
+    - Nos estamos viendo
+    - Nos estamos hablando
+    - Que tengas un buen dia
+    - chau chau
+    - despues hablamos
+    - hablamos luego
+    - muchas gracias
+    - gracias
+    - saludos
+    - nada
+    - en nada
+
+- intent: bot_challenge
+  examples: |
+    - eres un bot?
+    - eres humano?
+    - estoy hablando con un bot?
+    - estoy hablando con un humano?
+    - sos un bot?
+    - sos un humano?
+    - quien sos?
+    - como te llamas?
+
+- intent: mood_great
+  examples: |
+    - estoy [bien]{"entity":"mood","value":"happy"}
+    - Ando re [zarpado]{"entity":"mood","value":"happy"}
+    - [Alegre]{"entity":"mood","value":"happy"}
+    - Estoy [alegre]{"entity":"mood","value":"happy"}
+    - [bien]{"entity":"mood","value":"happy"}
+    - bien [bien]{"entity":"mood","value":"happy"}
+    - [bien] aca andamos{"entity":"mood","value":"happy"}
+    - [contento]{"entity":"mood","value":"happy"}
+    - [feliz]{"entity":"mood","value":"happy"}
+
+- intent: mood_unhappy
+  examples: |
+    - estoy teniendo un dia [horrible]{"entity":"mood","value":"sad"}
+    - estoy [triste]{"entity":"mood","value":"sad"}
+    - [deprimido]{"entity":"mood","value":"sad"}
+    - [masomenos]{"entity":"mood","value":"sad"}
+    - [angustiado]{"entity":"mood","value":"sad"}
+    - [decepcionado]{"entity":"mood","value":"sad"}
+    - [mal]{"entity":"mood","value":"sad"}
+    - re [mal]{"entity":"mood","value":"sad"}
+    - [he estado mejor]{"entity":"mood","value":"sad"}
+    - [no es mi mejor dia]{"entity":"mood","value":"sad"}
+    
+- intent: mood_angry
+  examples: |
+    - estoy [enojado]{"entity":"mood","value":"angry"}
+    - [enojado]{"entity":"mood","value":"angry"}
+    - [cansado]{"entity":"mood","value":"angry"}
+    - estoy [podrido]{"entity":"mood","value":"angry"}
+    - estoy [cansado]{"entity":"mood","value":"angry"}
+    - muy [enojado]{"entity":"mood","value":"angry"}
+    - muy [cansado]{"entity":"mood","value":"angry"}
+    - muy [furioso]{"entity":"mood","value":"angry"}
+    - estoy re [nervioso]{"entity":"mood","value":"angry"}
+    
+- intent: estado
+  examples: |
+    - vos, como estas?
+    - como estas?
+    - como te sentis?
+    - que tal estas?
+
+- intent: agradecimiento
+  examples: |
+    - genial
+    - buenisimos
+    - perfecto
+    - espectacular
+    - increible
+
+- intent: materiasCursadas
+  examples: |
+    - cursadas
+    - que materias cursaste
+    - cursaste
+    - que cursaste
+    - que materias tenes cursadas
+    - que has cursado
+
+- intent: materiasCursando
+  examples: |
+    - que materias estas cursando
+    - materias que cursas
+    - que cursas este cuatrimestre
+    - que cursas este cuatri
+    - que estas cursando
+
+- intent: materiasOptativas
+  examples: |
+    - que optativas hisiste
+    - que optativas realizaste
+    - optativas
+    - estas haciendo alguna optativa
+    - cursaste optativas
+    - tenes optativas cursadas
+    - realizaste optativas
+
+- intent: finales
+  examples: |
+    - debes finales
+    - que finales te quedan dar
+    - debes algun final
+    - tenes finales para dar
+    - finales
+    - te faltan finales
+
+- intent: carrera
+  examples: |
+    - porque decidiste estudiar esta carrera
+    - porque elegiste esta carrera
+    - porque quisiste estudiar esta carrera
+    - porque entraste a sistemas
+    - porque entraste a ingenieria de sistemas
+    - porque decidiste estudiar sistemas
+    - porque elegiste ingenieria de sistemas
+    - porque elegiste sistemas
+    - ingenieria de sistemas
+    - estudiar ingenieria de sistemas
+    - ingenieria
+    - carrera
+
+- intent: gustos
+  examples: |
+    - que temas te interezan de la carrera
+    - que temas te interezan mas de la carrera
+    - cuales son los temas mas relevantes de la carera
+    - cuales son los temas que mas te gustan
+    - que temas te gustan de la carrera
+    - que temas te interezan mas
+    - que te gusta de la carrera
+    - que es lo que mas te gusta de la carrera
+
+- intent: involucracionProgramacion
+  examples: |
+    - cual fue tu primer codigo
+    - cual fue tu primera involucracion con la programacion
+    - como te involucraste con la programacion
+    - como conociste la programacion
+    - como te integraste ala programacion
+    - como descubriste la programacion
+    - como te interesaste por la programacion
+
+- intent: affirm
+  examples: |
+    - si
+    - s
+    - claro
+    - por supuesto
+    - me vendria bien
+    - Me ayudaria mucho
+    - Seria estupendo
+    - seria genial
+    - si, por favor
+
+- intent: deny
+  examples: |
+    - no
+    - n
+    - no me parece
+    - no es necesario
+    - de ningun modo
+    - na
+    - na no lo necesito
+    - no lo necesito
+    - nono
+
+- intent: buscar
+  examples: |
+    - informacion sobre [rasa](busqueda)
+    - que sabes sobre [machine learning](busqueda)
+    - info [robot](busqueda)
+    - [robot](busqueda)
+
+- lookup: busqueda
+  examples: |
+    - rasa
+    - matematicas
+    - prolog
+    - logica difusa
+    - robotica
+    - inteligencia artificial
+    - pizza
+    - boca juniors
+    - RoboCup
+    - futbol
+    - autos autonomos
+    - chatbot
+
+- intent: devolverEventos
+  examples: |
+    - devolver eventos
+    - eventos
+    - que eventos tenes
+    - proximos eventos
+    - eventos proximos
+
+- intent: nuevoEvento
+  examples: |
+    - quiero una reunion
+    - pactar reunion
+    - cuando nos podemos reunir
+    - cuando nos juntamos
+    - cuando nos podemos juntar
+
+- intent: ingresarDia
+  examples: |
+    - nos juntamos [mañana](dia)
+    - [mañana](dia)
+    - podes [mañana](dia)
+    - puedo [hoy](dia)
+    - si queres el [lunes](dia)
+    - [hoy](dia)
+    - puedo el [martes](dia)
+    - nos juntamos [miercoles](dia)
+    - [jueves](dia)
+    - podes [sabado](dia)
+    - puedo [domingo](dia)
+    - si queres el [viernes](dia)
+
+# - lookup: dia
+#   examples: |
+#     - hoy
+#     - mañana
+#     - lunes
+#     - martes
+#     - miercoles
+#     - jueves
+#     - viernes
+#     - sabado
+#     - domingo
+    
+
+- intent: ingresarHorario
+  examples: |
+    - te parece a las [10](hora)
+    - a las [8](hora)
+    - tipo [16](hora)
+    - [20](hora)
+
+- regex: hora
+  examples: |
+   - \b([01][0-9]|2[0-3])\b

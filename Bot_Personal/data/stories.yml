@@ -1,0 +1,135 @@
+version: "3.1"
+
+stories:
+
+- story: greeting
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - action: action_traer_nombre
+  - action: utter_comoestas
+  - checkpoint: seguirComoEstas
+
+- story: happy_Angry_unhappy
+  steps:
+  - checkpoint: seguirComoEstas
+  - or:
+    - intent: mood_great
+    - intent: mood_angry
+    - intent: mood_unhappy
+  - or:
+    - slot_was_set: 
+      - mood: happy
+    - slot_was_set: 
+      - mood: angry
+    - slot_was_set: 
+      - mood: sad       
+  - action: action_mood
+  - checkpoint: seguir
+
+- story: chiste
+  steps:
+  - checkpoint: seguir
+  - intent: affirm
+  - action: ActionChistes
+
+- story: preguntarEstado
+  steps:
+  - intent: estado
+  - action: utter_contrarespuestas
+
+- story: carreraCursando
+  steps:
+  - intent: materiasCursando
+  - action: action_prolog_cursando
+
+- story: carreraCursadas
+  steps:
+  - intent: materiasCursadas
+  - action: action_prolog_cursadas
+
+- story: carreraFinales
+  steps:
+  - intent: finales
+  - action: action_prolog_finales
+
+- story: carreraOptativas
+  steps:
+  - intent: materiasOptativas
+  - action: utter_optativas
+
+- story: carreraOpinion
+  steps:
+  - intent: carrera
+  - action: utter_carrera
+
+- story: carreraGustos
+  steps:
+  - intent: gustos
+  - action: utter_gustopersonal
+
+- story: carreraProgramacion
+  steps:
+  - intent: involucracionProgramacion
+  - action: utter_primerasProgramacion
+
+- story: agradecimiento
+  steps:
+  - intent: agradecimiento
+  - action: utter_respuesta
+
+- story: quienEres
+  steps: 
+  - intent: bot_challenge
+  - action: utter_iamabot
+
+- story: saludo
+  steps:
+  - intent: Saludo
+  - action: action_saludo
+
+- story: buscarWikipedia
+  steps:
+  - intent: buscar
+    entities:
+    - busqueda 
+  - action: action_wikipedia_api
+  - checkpoint: continuar
+
+- story: NobuscaWikipedia
+  steps:
+  - intent: buscar
+  - slot_was_set:
+    - busqueda: None
+  - action: utter_NoEncontroBusqueda  
+
+- story: darLink
+  steps:
+  - checkpoint: continuar
+  - intent: affirm
+  - action: action_wikipedia_link
+
+- story: nodarLink
+  steps:
+  - checkpoint: continuar
+  - checkpoint: seguir
+  - intent: deny
+  - action: action_wikipedia_linkNegado
+
+- story: devolverEventos
+  steps:
+  - intent: devolverEventos
+  - action: action_get_eventos
+
+- story: reunion
+  steps:
+  - intent: nuevoEvento
+  - action: utter_dameDia
+  - intent: ingresarDia
+    entities: 
+    - dia 
+  - action: action_guardarMensaje
+  - intent: ingresarHorario
+    entities: 
+    - hora 
+  - action: action_crear_evento
