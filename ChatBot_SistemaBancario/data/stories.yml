@@ -1,0 +1,44 @@
+version: "3.1"
+
+stories:
+
+- story: greeting
+  steps:
+  - intent: saludo
+  - action: utter_saludo
+  - action: utter_pedirNombre
+  - intent: presentation
+    entities:
+    - name
+  - slot_was_set:
+    - name
+  - action: utter_pedirDNI
+  - intent: tomarDNI
+    entities:
+    - dni
+  - slot_was_set:
+    - dni
+  - action: utter_welcome
+
+
+- story: operaciones
+  steps:
+  - intent: temas
+    entities:
+    - tema
+  - slot_was_set:
+    - tema
+  - action: action_Tema
+  - action: utter_continuarOperando
+
+
+- story: continuarOperando
+  steps:
+  - intent: affirmacion
+  - action: utter_ayuda
+
+
+- story: dejar de operar
+  steps:
+  - intent: negacion
+  - action: utter_goodbye

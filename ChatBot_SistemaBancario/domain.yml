@@ -1,0 +1,68 @@
+version: "3.1"
+
+intents:
+- saludo
+- goodbye
+- temas
+- presentation
+- tomarDNI
+- affirmacion
+- negacion
+
+entities:
+- name
+- dni
+- tema
+
+slots:
+  name:
+    type: text
+    mappings:
+    - type: from_entity
+      entity: name
+  dni:
+    type: text
+    mappings:
+    - type: from_entity
+      entity: dni
+  tema:
+    type: categorical
+    values:
+      - cuentaBancaria
+      - tarjetaDebito
+      - tarjetaCredito
+    mappings:
+    - type: from_entity
+      entity: tema
+
+responses:
+  utter_saludo:
+  - text: "Hola! Soy el Sistema Bancario que te ayudara a resolver tus consultas"
+  - text: "Buenas! Estoy para aqui para resolver tus dudas"
+  - text: "Hola! Espero que andes bien; estoy aqui para resolver tus dudas"
+  - text: "Buenas! Quisiera poder ayudarte a resolver tus consultas"
+
+  utter_pedirNombre:
+  - text: "Cual es tu nombre? "
+
+  utter_continuarOperando:
+  - text: "Desea realizar otra operacion? "
+
+  utter_welcome:
+  - text: "Buenisimo; En que lo puedo ayudar?."
+
+  utter_ayuda:
+  - text: "Digame en que lo podria ayudar?"
+  
+  utter_goodbye:
+  - text: "Adios {name}; Que sigas bien!!"
+
+  utter_pedirDNI:
+  - text: "Bienvenido {name}, para poder ingresar en el sistema, le vamos a pedir su DNI"
+
+session_config:
+  session_expiration_time: 60
+  carry_over_slots_to_new_session: true
+
+actions:
+- action_Tema

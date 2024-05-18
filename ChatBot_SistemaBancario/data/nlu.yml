@@ -1,0 +1,108 @@
+version: "3.1"
+
+nlu:
+- intent: saludo
+  examples: |
+    - Hola
+    - Hola!
+    - Holis
+    - Buenas
+    - Bueenas
+    - Buen dia
+    - Buenos dias
+    - Buenas tardes
+    - Buenas noches
+    - hey
+    - que onda
+
+- intent: goodbye
+  examples: |
+    - Adios
+    - Chau
+    - Nos vemos
+    - Nos estamos viendo
+    - Que tengas un buen dia
+    - chau chau
+    - despues hablamos
+    - hablamos luego
+    - muchas gracias
+    - gracias
+
+- intent: affirmacion
+  examples: |
+    - si
+    - s
+    - claro
+    - por supuesto
+    - me vendria bien
+    - Me ayudaria mucho
+    - Seria estupendo
+    - seria genial
+    - si, por favor
+
+- intent: negacion
+  examples: |
+    - no
+    - n
+    - nunca
+    - no me parece
+    - no es necesario
+    - de ningun modo
+    - na
+    - na no lo necesito
+    - no lo necesito
+    - nono
+    - nono esta bien
+
+- intent: temas
+  examples: |
+    - quiero crear una cuenta [bancaria]{"entity":"tema","value":"cuentaBancaria"}
+    - crear cuenta [bancaria]{"entity":"tema","value":"cuentaBancaria"}
+    - sacar cuenta [bancaria]{"entity":"tema","value":"cuentaBancaria"}
+    - quiero crear una [cuenta]{"entity":"tema","value":"cuentaBancaria"}
+    - crear [cuenta]{"entity":"tema","value":"cuentaBancaria"}
+    - sacar [cuenta]{"entity":"tema","value":"cuentaBancaria"}
+    - solicitar [cuenta]{"entity":"tema","value":"cuentaBancaria"}
+    - solicitar cuenta [bancaria]{"entity":"tema","value":"cuentaBancaria"}
+    - quiero sacar una tarjeta de [debito]{"entity":"tema","value":"tarjetaDebito"}
+    - quiero tarjeta de [debito]{"entity":"tema","value":"tarjetaDebito"}
+    - tarjeta de [debito]{"entity":"tema","value":"tarjetaDebito"}
+    - solicitar tarjeta de [debito]{"entity":"tema","value":"tarjetaDebito"}
+    - sacar tarjeta de [debito]{"entity":"tema","value":"tarjetaDebito"}
+    - quiero sacar una tarjeta de [credito]{"entity":"tema","value":"tarjetaCredito"}
+    - quiero tarjeta de [credito]{"entity":"tema","value":"tarjetaCredito"}
+    - tarjeta de [credito]{"entity":"tema","value":"tarjetaCredito"}
+    - solicitar tarjeta de [credito]{"entity":"tema","value":"tarjetaCredito"}
+    - sacar tarjeta de [credito]{"entity":"tema","value":"tarjetaCredito"}
+
+- intent: presentation
+  examples: |
+    - Mi nombre es [Juan]{"entity":"name","value":"Juan"}
+    - Mi nombre es [Enzo]{"entity":"name","value":"Enzo"}
+    - Me llamo [Enzo]{"entity":"name","value":"Enzo"}
+    - Me llamo [Juan]{"entity":"name","value":"Juan"}
+    - Mi nombre es [Ramon]{"entity":"name","value":"Ramon"}
+    - Mi nombre es [Simon]{"entity":"name","value":"Simon"}
+    - Me llamo [Ramon]{"entity":"name","value":"Ramon"}
+    - Me llamo [Analia]{"entity":"name","value":"Analia"}
+    - Mi nombre es [Analia]{"entity":"name","value":"Analia"}
+    - Mi nombre es [Lara]{"entity":"name","value":"Lara"}
+    - Me llamo [Lara]{"entity":"name","value":"Lara"}
+    - Me llamo [Maria]{"entity":"name","value":"Maria"}
+    - Mi nombre es [Maria]{"entity":"name","value":"Maria"}
+    - Mi nombre es [Tomas]{"entity":"name","value":"Tomas"}
+    - Me llamo [Tomas]{"entity":"name","value":"Tomas"}
+    - Me conocen como 
+    - Soy 
+
+- intent: tomarDNI
+  examples: |
+    - [42883765]{"entity":"dni","value":"42883765"}
+    - mi dni es [42883765]{"entity":"dni","value":"42883765"}
+    - [23456345]{"entity":"dni","value":"23456345"}
+    - mi dni es [23456345]{"entity":"dni","value":"23456345"}
+    - es [12645789]{"entity":"dni","value":"12645789"}
+
+- regex: tomarDNI
+  examples: |
+    - \d{8}
