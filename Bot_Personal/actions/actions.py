@@ -14,14 +14,16 @@ from .apiCalendar import event, get_event
 from time import sleep
 import wikipediaapi
 import telebot
+import os
 import os.path
 import json
 import requests
 import datetime
 import pyjokes
 
-TOKEN = '5631646530:AAHhaAl382HhrwsRvHAY79JoxYHa9ya7hNA'
-bot = telebot.TeleBot(TOKEN)
+# Preferir token desde variable de entorno para evitar hardcodear secretos
+TOKEN = os.getenv('TELEGRAM_API_TOKEN')
+bot = telebot.TeleBot(TOKEN) if TOKEN else None
 
 class ActionSaludo(Action):
 
@@ -29,15 +31,16 @@ class ActionSaludo(Action):
         return "action_saludo"
     
     def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
-        input_data=tracker.latest_message
-        from_data=input_data["metadata"]["message"]["from"]
-        
-        name= from_data["first_name"]
-        if name is None:
-            dispatcher.utter_message("Nos vemos! Que sigas bien!")
+        input_data = tracker.latest_message or {}
+        metadata = input_data.get("metadata", {})
+        from_data = (metadata.get("message") or {}).get("from") or {}
+
+        name = from_data.get("first_name")
+        if name:
+            dispatcher.utter_message(f"Nos vemos {name}! Que sigas bien!")
         else:
-            dispatcher.utter_message("Nos vemos  "+ name +"! Que sigas bien!".format(name))             
-        return[]
+            dispatcher.utter_message("Nos vemos! Que sigas bien!")
+        return []
 
 class OperarArchivo():
 
@@ -74,19 +77,20 @@ class action_prolog_cursadas(Action):
        return "action_prolog_cursadas"
 
     def run(self, dispatcher: CollectingDispatcher,tracker: Tracker, domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        pl_local_path = os.path.join(os.path.dirname(__file__), 'Materias(Sistemas).pl')
         with PrologMQI(port=8000) as mqi:
             with mqi.create_thread() as prolog_thread:
-                direccion= create_posix_path('C:/Users/54228/Documents/rasa_projects/new_rasa_project/Bot_Personal/actions/Materias(Sistemas).pl')
+                direccion = create_posix_path(pl_local_path)
                 prolog_thread.query_async(f'consult("{direccion}").', find_all=False)
                 prolog_thread.query_async_result()
-                prolog_thread.query_async(f"cursadas(X).", find_all=True)
+                prolog_thread.query_async("cursadas(X).", find_all=True)
                 sleep(0.1)
-                result=prolog_thread.query_async_result()
+                result = prolog_thread.query_async_result()
                 print(str(result))
                 if result:
-                    mensaje="Ya curse: " + "\n "
+                    mensaje = "Ya curse: \n "
                     for iterator in result:
-                        mensaje= mensaje + iterator['X'] + "\n "
+                        mensaje = mensaje + iterator['X'] + "\n "
                     dispatcher.utter_message(text=mensaje)
         return []
 
@@ -95,19 +99,20 @@ class action_prolog_cursando(Action):
        return "action_prolog_cursando"
 
     def run(self, dispatcher: CollectingDispatcher,tracker: Tracker, domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        pl_local_path = os.path.join(os.path.dirname(__file__), 'Materias(Sistemas).pl')
         with PrologMQI(port=8000) as mqi:
             with mqi.create_thread() as prolog_thread:
-                direccion= create_posix_path('C:/Users/54228/Documents/rasa_projects/new_rasa_project/Bot_Personal/actions/Materias(Sistemas).pl')
+                direccion = create_posix_path(pl_local_path)
                 prolog_thread.query_async(f'consult("{direccion}").', find_all=False)
                 prolog_thread.query_async_result()
-                prolog_thread.query_async(f"cursando(X).", find_all=True)
+                prolog_thread.query_async("cursando(X).", find_all=True)
                 sleep(0.1)
-                result=prolog_thread.query_async_result()
+                result = prolog_thread.query_async_result()
                 print(str(result))
                 if result:
-                    mensaje="Actualmente estoy cursando: " + "\n "
+                    mensaje = "Actualmente estoy cursando: \n "
                     for iterator in result:
-                        mensaje= mensaje + iterator['X'] + "\n "
+                        mensaje = mensaje + iterator['X'] + "\n "
                     dispatcher.utter_message(text=mensaje)
         return []
 
@@ -116,19 +121,20 @@ class action_prolog_finales(Action):
        return "action_prolog_finales"
 
     def run(self, dispatcher: CollectingDispatcher,tracker: Tracker, domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        pl_local_path = os.path.join(os.path.dirname(__file__), 'Materias(Sistemas).pl')
         with PrologMQI(port=8000) as mqi:
             with mqi.create_thread() as prolog_thread:
-                direccion= create_posix_path('C:/Users/54228/Documents/rasa_projects/new_rasa_project/Bot_Personal/actions/Materias(Sistemas).pl')
+                direccion = create_posix_path(pl_local_path)
                 prolog_thread.query_async(f'consult("{direccion}").', find_all=False)
                 prolog_thread.query_async_result()
-                prolog_thread.query_async(f"finales(X).", find_all=True)
+                prolog_thread.query_async("finales(X).", find_all=True)
                 sleep(0.1)
-                result=prolog_thread.query_async_result()
+                result = prolog_thread.query_async_result()
                 print(str(result))
                 if result:
-                    mensaje="Debo los finales de: " + "\n "
+                    mensaje = "Debo los finales de: \n "
                     for iterator in result:
-                        mensaje= mensaje + iterator['X'] + "\n "
+                        mensaje = mensaje + iterator['X'] + "\n "
                     dispatcher.utter_message(text=mensaje)
         return []
 
@@ -138,24 +144,26 @@ class traer_nombre(Action):
        return "action_traer_nombre"
 
     def run(self, dispatcher: CollectingDispatcher,tracker: Tracker, domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
-        input_data=tracker.latest_message
-        from_data=input_data["metadata"]["message"]["from"]
-        llave_id=from_data["id"]
-        
-        name= from_data["first_name"]
+        input_data = tracker.latest_message or {}
+        metadata = input_data.get("metadata", {})
+        from_data = (metadata.get("message") or {}).get("from") or {}
+        llave_id = from_data.get("id")
+
+        name = from_data.get("first_name")
         surname= from_data.get("last_name")
         persona= OperarArchivo.cargarArchivo()
         
-        if not (str(llave_id)) in persona:
-            mensaje="Un gusto "+name+", no te conocia"
-            persona[llave_id]= {}
-            persona[llave_id]['nombre']= name
-            if surname:
-                persona[llave_id]['apellido']= surname
-            OperarArchivo.guardar(persona)        
-            dispatcher.utter_message(text=str(mensaje))
+        if llave_id and name:
+            if not (str(llave_id)) in persona:
+                mensaje = f"Un gusto {name}, no te conocia"
+                persona[llave_id] = {}
+                persona[llave_id]['nombre'] = name
+                if surname:
+                    persona[llave_id]['apellido'] = surname
+                OperarArchivo.guardar(persona)
+                dispatcher.utter_message(text=str(mensaje))
         
-        print(from_data) 
+        print(from_data)
         return []
 
 class wikipediaAPI(Action):
@@ -184,8 +192,9 @@ class wikipediaAPI(Action):
                 dispatcher.utter_message(text=str(mensaje))
                 dispatcher.utter_message(text=str(mensaje1))
                 dispatcher.utter_message(text=str(link))
-                SlotSet("respBuscar", True)
+                return [SlotSet("respondido", False), SlotSet("respBuscar", True)]
 
+        # Asegurar slots coherentes aunque no exista la página
         return [SlotSet("respondido", False)]
 
 class action_wikipedia_link(Action):
@@ -221,10 +230,17 @@ class ActionMood(Action):
    def run(self,dispatcher: CollectingDispatcher,tracker: Tracker, domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
         tema = tracker.get_slot("mood")
 
-        input_data=tracker.latest_message
-        chat_id=input_data["metadata"]["message"]["chat"]["id"]
-        file_image= 'C:/Users/54228/Documents/rasa_projects/new_rasa_project/motivadora.jpg'
-        photo=open(file_image,'rb')
+        input_data = tracker.latest_message or {}
+        metadata = input_data.get("metadata", {})
+        chat_id = ((metadata.get("message") or {}).get("chat") or {}).get("id")
+        # Imagen motivadora opcional
+        file_image = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'motivadora.jpg')
+        photo = None
+        if os.path.isfile(file_image):
+            try:
+                photo = open(file_image,'rb')
+            except Exception:
+                photo = None
 
         if tema == "happy":
             mensaje= "Me alegro mucho!"
@@ -232,7 +248,8 @@ class ActionMood(Action):
         elif tema == "sad":
             mensaje= "Espero que te haga sentir mejor!"
             mensaje1= "Queres que te cuente un chiste?"
-            bot.send_photo(chat_id, photo)        
+            if bot and chat_id and photo:
+                bot.send_photo(chat_id, photo)
         elif tema == "angry":
             mensaje= "Estoy aqui para lo que necesites"
             mensaje1= "En que puedo ayudarte?"
@@ -242,43 +259,62 @@ class ActionMood(Action):
         
         dispatcher.utter_message(text=str(mensaje))
         dispatcher.utter_message(text=str(mensaje1))
-        return[]
+        return []
 
 class ActionPinear(Action):
    def name(self) -> Text:
        return "actionPinear"
    def run(self,dispatcher: CollectingDispatcher,tracker: Tracker, domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
-        input_data=tracker.latest_message
-        chat_id=input_data["metadata"]["message"]["chat"]["id"]
-        message_id=input_data["metadata"]["message"]["message_id"]
+        input_data = tracker.latest_message or {}
+        metadata = input_data.get("metadata", {})
+        chat = (metadata.get("message") or {}).get("chat") or {}
+        chat_id = chat.get("id")
+        message_id = (metadata.get("message") or {}).get("message_id")
+
+        if not TOKEN:
+            dispatcher.utter_message(text="No tengo configurado el token de Telegram para pinear mensajes.")
+            return []
+
+        if not chat_id or not message_id:
+            dispatcher.utter_message(text="No encuentro el chat o mensaje para pinear.")
+            return []
 
         getUrl = f'https://api.telegram.org/bot{TOKEN}/pinChatMessage'
         params_ChatMessage = {
-        "chat_id": chat_id,
-        "message_id": message_id
-            }
+            "chat_id": chat_id,
+            "message_id": message_id
+        }
         r = requests.get(getUrl, params_ChatMessage)
         print(r.text)
-        return[]
+        return []
 
 class ActionResponder(Action):
    def name(self) -> Text:
        return "actionResponder"
    def run(self,dispatcher: CollectingDispatcher,tracker: Tracker, domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
-        chat_id= tracker.get_slot("id_chat")
-        message_id= tracker.get_slot("id_message")
-        input_data=tracker.latest_message
-        name=input_data["metadata"]["message"]["from"]["first_name"]
-        message= name + " Quedamos para ese dia!"
-        
+        chat_id = tracker.get_slot("id_chat")
+        message_id = tracker.get_slot("id_message")
+        input_data = tracker.latest_message or {}
+        metadata = input_data.get("metadata", {})
+        name = ((metadata.get("message") or {}).get("from") or {}).get("first_name") or ""
+        message = (name + " Quedamos para ese dia!").strip()
+
+        if not TOKEN:
+            dispatcher.utter_message(text="No tengo configurado el token de Telegram para responder en hilo.")
+            return []
+
+        if not chat_id or not message_id:
+            dispatcher.utter_message(text="No tengo el mensaje anterior para responder.")
+            return []
+
         getUrl = f'https://api.telegram.org/bot{TOKEN}/sendMessage'
         params_sendMessage = {
-        "chat_id": chat_id,
-        "text": message,
-        "reply_to_message_id": message_id
-            }
+            "chat_id": chat_id,
+            "text": message,
+            "reply_to_message_id": message_id
+        }
         r = requests.get(getUrl, params_sendMessage)
-        return[]
+        return []
 
 class Action_get_eventos(Action):
    def name(self) -> Text:
@@ -304,13 +340,15 @@ class Action_guardarMensaje(Action):
    def name(self) -> Text:
        return "action_guardarMensaje"
    def run(self,dispatcher: CollectingDispatcher,tracker: Tracker, domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
-        input_data=tracker.latest_message
-        chat_id=input_data["metadata"]["message"]["chat"]["id"]
-        message_id=input_data["metadata"]["message"]["message_id"]
+        input_data = tracker.latest_message or {}
+        metadata = input_data.get("metadata", {})
+        chat = (metadata.get("message") or {}).get("chat") or {}
+        chat_id = chat.get("id")
+        message_id = (metadata.get("message") or {}).get("message_id")
 
-        message= "Buenisimo, que horario te queda mejor?"
+        message = "Buenisimo, que horario te queda mejor?"
         dispatcher.utter_message(text=str(message))
-        return[SlotSet("id_chat", chat_id), SlotSet("id_message", message_id)]
+        return [SlotSet("id_chat", chat_id), SlotSet("id_message", message_id)]
 
 class Action_crear_evento(Action):
    def name(self) -> Text:
@@ -340,10 +378,12 @@ class Action_crear_evento(Action):
             fechaFinal= fechaInicial+ datetime.timedelta(hours=1)
 
         persona= OperarArchivo.cargarArchivo()
-        input_data=tracker.latest_message
-        persona_id= input_data["metadata"]["message"]["from"]["id"]
+        input_data = tracker.latest_message or {}
+        metadata = input_data.get("metadata", {})
+        from_data = (metadata.get("message") or {}).get("from") or {}
+        persona_id = from_data.get("id")
 
-        if (str(persona_id)) in persona:
+        if persona_id and (str(persona_id)) in persona:
             nom_persona= persona[str(persona_id)]["nombre"]
             apell_persona= persona[str(persona_id)].get("apellido")
             if apell_persona:
@@ -352,8 +392,8 @@ class Action_crear_evento(Action):
             #event(nom_persona, fechaInicial.isoformat(), fechaFinal.isoformat())
             evento= event(nom_persona, fechaInicial.isoformat(), fechaFinal.isoformat())
 
-            input_data=tracker.latest_message
-            grupo=input_data["metadata"]["message"]["chat"]["type"]
+            chat = (metadata.get("message") or {}).get("chat") or {}
+            grupo = chat.get("type")
 
             if grupo == "supergroup" or grupo == "group":
                 message= "Perfecto, les dejo el link de la reunion por si alguien mas se quiere unir"
