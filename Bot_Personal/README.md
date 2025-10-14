@@ -87,19 +87,47 @@ ngrok http 5005
 - Limpiar modelos antiguos: elimina la carpeta `models/`.
 - Regenerar token de Google: borra `token.json` y vuelve a ejecutar una acción de calendario.
 
-## Automatización (start.ps1)
 
-Puedes arrancar todo con un script que crea el venv si hace falta, instala dependencias, entrena (si no hay modelos) y abre dos ventanas: acciones y servidor.
+## Ejecución sencilla con Telegram
 
-```powershell
-# En la carpeta Bot_Personal
-./start.ps1
+1. **Copia y edita tu archivo de entorno:**
+	- Copia `.env.example` a `.env`.
+	- Completa los valores:
+	  - `TELEGRAM_API_TOKEN=tu_token_de_telegram`
+	  - `BOT_USERNAME=JuanIgCuevasBot` (o el nombre de tu bot)
+	  - `NGROK_AUTHTOKEN=tu_token_de_ngrok` (si usas ngrok)
 
-# Forzar entrenamiento
-./start.ps1 -Train
+2. **Ejecuta el starter automático:**
+	- Abre PowerShell en la carpeta `Bot_Personal`.
+	- Ejecuta:
+	  ```powershell
+	  ./start.ps1 -Ngrok
+	  ```
+	- Esto:
+	  - Crea el entorno virtual y instala dependencias si hace falta.
+	  - Entrena el modelo si no existe.
+	  - Inicia ngrok y obtiene la URL pública.
+	  - Genera `credentials.runtime.yml` con tus datos y la URL de ngrok.
+	  - Abre dos ventanas: una para el action server y otra para el bot.
+	  - Guarda logs en `logs/actions.log` y `logs/server.log`.
 
-# Iniciar también ngrok (si está instalado)
-./start.ps1 -Ngrok
-```
+3. **Probar el bot por Telegram:**
+	- Escribe a tu bot en Telegram (@JuanIgCuevasBot).
+	- Espera unos segundos si es la primera vez (puede demorar en cargar TensorFlow).
+	- Si no responde, revisa los logs para ver errores.
 
-Variables de entorno: copia `.env.example` a `.env` y completa `TELEGRAM_API_TOKEN` si usarás Telegram. El script las cargará automáticamente.
+4. **Notas sobre credenciales:**
+	- No edites manualmente `credentials.runtime.yml`; el script lo genera cada vez.
+	- `credentials.yml` es solo plantilla, no debe tener secretos.
+	- Los secretos y logs están ignorados en `.gitignore`.
+
+5. **Modo REST (sin Telegram):**
+	- Si no completas el token o no usas ngrok, el bot se ejecuta solo por REST.
+	- Puedes probar con:
+	  ```powershell
+	  ./start.ps1
+	  ```
+
+---
+
+Este flujo te permite ejecutar el bot con Telegram de forma sencilla y segura, sin editar archivos de credenciales manualmente. Solo necesitas completar `.env` y correr el script.

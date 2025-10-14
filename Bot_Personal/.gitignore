@@ -15,3 +15,23 @@ __pycache__/
 # OS files
 .DS_Store
 Thumbs.db
+
+# Archivo de variables de entorno
+.env
+.env.*
+!.env.example
+
+# Rasa runtime credentials (generadas por el starter)
+credentials.runtime.yml
+
+# Credenciales sensibles (no subir)
+credentials.json
+*.secrets
+*.secret
+*.key
+*.pem
+*.p12
+*.pfx
+
+# Otros artefactos locales
+logs/

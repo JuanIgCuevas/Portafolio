@@ -89,7 +89,15 @@ if (Test-Path $envFile) {
 }
 
 # 4) Chequeos opcionales
-# SWI-Prolog
+# SWI-Prolog: intentar añadir al PATH si está instalado en la ruta típica de Windows
+$swiplDir = 'C:\\Program Files\\swipl\\bin'
+if (Test-Path (Join-Path $swiplDir 'swipl.exe')) {
+    $pathParts = $env:Path -split ';'
+    if (-not ($pathParts -contains $swiplDir)) {
+        $env:Path = "$swiplDir;" + $env:Path
+        Write-Host "Añadido SWI-Prolog al PATH para esta sesión." -ForegroundColor DarkCyan
+    }
+}
 try { & swipl --version | Out-Null } catch { Write-Host "Aviso: SWI-Prolog no encontrado en PATH. Acciones Prolog no funcionarán." -ForegroundColor DarkYellow }
 
 # 5) Entrenar si se pide o si no hay modelos
@@ -100,41 +108,84 @@ if ($shouldTrain) {
     & $RasaExe train
 }
 
-# 6) Levantar servidores en ventanas separadas
+# 6) ngrok opcional (iniciar antes de levantar servidores para obtener URL)
+$ngrokPublicUrl = $null
+if ($Ngrok) {
+    try {
+        if ($env:NGROK_AUTHTOKEN -and $env:NGROK_AUTHTOKEN -ne "") {
+            try { & ngrok config add-authtoken $env:NGROK_AUTHTOKEN | Out-Null } catch { }
+        }
+        # Iniciar ngrok en una ventana aparte
+        Start-Process -FilePath "ngrok" -ArgumentList "http","5005" -WindowStyle Normal | Out-Null
+        # Esperar hasta que el API local de ngrok exponga los túneles
+        for ($i=0; $i -lt 30; $i++) {
+            try {
+                $tunnels = Invoke-RestMethod -Uri "http://127.0.0.1:4040/api/tunnels" -TimeoutSec 2 -ErrorAction Stop
+                $httpsTunnel = $tunnels.tunnels | Where-Object { $_.proto -eq 'https' } | Select-Object -First 1
+                if ($httpsTunnel) { $ngrokPublicUrl = $httpsTunnel.public_url; break }
+            } catch { }
+            Start-Sleep -Seconds 1
+        }
+        if ($ngrokPublicUrl) {
+            Write-Host "ngrok URL: $ngrokPublicUrl" -ForegroundColor Cyan
+        } else {
+            Write-Host "No se pudo obtener la URL pública de ngrok aún. Puedes pegarla luego en credentials.yml manualmente." -ForegroundColor DarkYellow
+        }
+    } catch {
+        Write-Host "No se pudo iniciar ngrok. Asegúrate de tenerlo instalado y en PATH." -ForegroundColor DarkYellow
+    }
+}
+
+# 7) Levantar servidores en ventanas separadas
 $ps = (Get-Command powershell).Source
 
 # Action server
-$actionCmd = "Set-Location `"$ScriptDir`"; & .\.venv\\Scripts\\rasa run actions"
+# Crear carpeta de logs y levantar servidores con logging
+New-Item -ItemType Directory -Path (Join-Path $ScriptDir "logs") -Force | Out-Null
+
+$actionCmd = "Set-Location `"$ScriptDir`"; $env:PYTHONIOENCODING='utf-8'; & .\.venv\\Scripts\\rasa run actions --debug 2>&1 | Tee-Object -FilePath `"$(Join-Path $ScriptDir 'logs\\actions.log')`" -Append"
 Start-Process -FilePath $ps -ArgumentList "-NoExit","-Command", $actionCmd -WindowStyle Normal
 
 # Rasa server
 $credFile = Join-Path $ScriptDir "credentials.yml"
 $credRest = Join-Path $ScriptDir "credentials.rest.yml"
 $useCred = $credFile
+
+$hasToken = ($env:TELEGRAM_API_TOKEN -and $env:TELEGRAM_API_TOKEN -ne "")
+$hasBotUser = ($env:BOT_USERNAME -and $env:BOT_USERNAME -ne "")
+$hasNgrok = ($ngrokPublicUrl -and $ngrokPublicUrl -ne "")
+
+$hasPlaceholders = $false
 if (Test-Path $credFile) {
-    try {
-        $credContent = Get-Content $credFile -Raw
-    } catch { $credContent = "" }
-    # Si no hay token en .env o el credentials.yml tiene placeholders, usar el de solo REST
-    if (-not $env:TELEGRAM_API_TOKEN -or $env:TELEGRAM_API_TOKEN -eq "" -or ($credContent -match "<TU_TOKEN_DE_TELEGRAM>")) {
-        $useCred = $credRest
-        Write-Host "Usando credentials.rest.yml (REST solamente) porque no hay token de Telegram configurado." -ForegroundColor DarkYellow
-    }
+    try { $credContent = Get-Content $credFile -Raw } catch { $credContent = "" }
+    if ($credContent -match "<TU_TOKEN_DE_TELEGRAM>|<TU_USUARIO_DE_BOT>|<TU_DOMINIO_PUBLICO>") { $hasPlaceholders = $true }
 } else {
     $useCred = $credRest
 }
 
-$botCmd = "Set-Location `"$ScriptDir`"; & .\\.venv\\Scripts\\rasa run --endpoints endpoints.yml --credentials `"$useCred`" --enable-api"
+# Preferir credenciales runtime si tenemos todo para Telegram (token, usuario y URL ngrok)
+if ($hasToken -and $hasBotUser -and $hasNgrok) {
+    $runtimeCred = Join-Path $ScriptDir "credentials.runtime.yml"
+@"
+rest:
+
+telegram:
+  access_token: "$($env:TELEGRAM_API_TOKEN)"
+  verify: "$($env:BOT_USERNAME)"
+  webhook_url: "$($ngrokPublicUrl)/webhooks/telegram/webhook"
+
+rasa:
+  url: "http://localhost:5002/api"
+"@ | Set-Content -Path $runtimeCred -NoNewline
+    $useCred = $runtimeCred
+    Write-Host "Generado credentials.runtime.yml con Telegram y webhook ($ngrokPublicUrl)." -ForegroundColor Cyan
+} elseif ($useCred -eq $credRest -or $hasPlaceholders -or -not $hasToken) {
+    $useCred = $credRest
+    Write-Host "Usando credentials.rest.yml (REST solamente). Completa BOT_USERNAME y usa -Ngrok para habilitar Telegram." -ForegroundColor DarkYellow
+}
+
+$botCmd = "Set-Location `"$ScriptDir`"; $env:PYTHONIOENCODING='utf-8'; & .\\.venv\\Scripts\\rasa run --endpoints endpoints.yml --credentials `"$useCred`" --enable-api --debug 2>&1 | Tee-Object -FilePath `"$(Join-Path $ScriptDir 'logs\\server.log')`" -Append"
 Start-Process -FilePath $ps -ArgumentList "-NoExit","-Command", $botCmd -WindowStyle Normal
 
-# 7) ngrok opcional
-if ($Ngrok) {
-    try {
-        Start-Process -FilePath "ngrok" -ArgumentList "http","5005" -WindowStyle Normal
-        Write-Host "ngrok iniciado. Copia la URL pública y colócala en credentials.yml (webhook_url)." -ForegroundColor Cyan
-    } catch {
-        Write-Host "No se pudo iniciar ngrok. Asegúrate de tenerlo instalado y en PATH." -ForegroundColor DarkYellow
-    }
-}
 
 Write-Host "Listo. Se abrieron ventanas para actions y server. Usa Ctrl+C en esas ventanas para detenerlos." -ForegroundColor Cyan
